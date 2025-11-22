@@ -1,9 +1,16 @@
 import { useState } from 'react';
-import { Menu, X, Search } from 'lucide-react';
+import { Menu, X, Search, User, LogOut, Settings } from 'lucide-react';
 import { Button } from './ui/button';
 
-export function Header() {
+interface HeaderProps {
+  user: { name: string; email: string } | null;
+  onLoginClick: () => void;
+  onLogout: () => void;
+}
+
+export function Header({ user, onLoginClick, onLogout }: HeaderProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
   const navItems = [
     { name: '首页', href: '#home' },
@@ -43,8 +50,57 @@ export function Header() {
             <Button variant="ghost" size="icon">
               <Search className="h-5 w-5" />
             </Button>
-            <Button variant="outline">登录</Button>
-            <Button>注册</Button>
+            
+            {user ? (
+              <div className="relative">
+                <button
+                  onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+                  className="flex items-center space-x-2 p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <div className="w-8 h-8 bg-gradient-to-br from-blue-600 to-blue-800 rounded-full flex items-center justify-center">
+                    <span className="text-white text-sm">{user.name.charAt(0)}</span>
+                  </div>
+                  <span className="text-gray-700">{user.name}</span>
+                </button>
+                
+                {isUserMenuOpen && (
+                  <div className="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-200 py-2">
+                    <div className="px-4 py-3 border-b border-gray-200">
+                      <p className="text-gray-900">{user.name}</p>
+                      <p className="text-gray-500 truncate">{user.email}</p>
+                    </div>
+                    <a
+                      href="#profile"
+                      className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100"
+                    >
+                      <User className="h-4 w-4 mr-3" />
+                      个人中心
+                    </a>
+                    <a
+                      href="#settings"
+                      className="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100"
+                    >
+                      <Settings className="h-4 w-4 mr-3" />
+                      设置
+                    </a>
+                    <div className="border-t border-gray-200 mt-2 pt-2">
+                      <button
+                        onClick={onLogout}
+                        className="flex items-center w-full px-4 py-2 text-red-600 hover:bg-red-50"
+                      >
+                        <LogOut className="h-4 w-4 mr-3" />
+                        退出登录
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <>
+                <Button variant="outline" onClick={onLoginClick}>登录</Button>
+                <Button>注册</Button>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -70,8 +126,27 @@ export function Header() {
                 </a>
               ))}
               <div className="flex flex-col space-y-2 pt-4 border-t">
-                <Button variant="outline">登录</Button>
-                <Button>注册</Button>
+                {user ? (
+                  <>
+                    <div className="px-4 py-3 bg-gray-50 rounded-lg">
+                      <p className="text-gray-900">{user.name}</p>
+                      <p className="text-gray-500 truncate">{user.email}</p>
+                    </div>
+                    <Button variant="outline" className="justify-start">
+                      <User className="h-4 w-4 mr-2" />
+                      个人中心
+                    </Button>
+                    <Button variant="outline" onClick={onLogout} className="justify-start text-red-600">
+                      <LogOut className="h-4 w-4 mr-2" />
+                      退出登录
+                    </Button>
+                  </>
+                ) : (
+                  <>
+                    <Button variant="outline" onClick={onLoginClick}>登录</Button>
+                    <Button>注册</Button>
+                  </>
+                )}
               </div>
             </nav>
           </div>
